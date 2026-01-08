@@ -1,56 +1,146 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlane, FaCalendarAlt, FaClock, FaUsers, FaBus, FaCheckCircle, FaEnvelope } from 'react-icons/fa';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm } from 'react-hook-form';
+import { FaClock, FaUsers, FaBus, FaCheckCircle, FaEnvelope } from 'react-icons/fa';
 import 'react-datepicker/dist/react-datepicker.css';
 import './DatePicker.css';
 
-const TransportationForm = () => {
-  // Load saved data from localStorage on mount
-  const [formData, setFormData] = useState(() => {
-    const savedData = localStorage.getItem('transportationFormData');
-    if (savedData) {
-      const parsed = JSON.parse(savedData);
-      // Convert date strings back to Date objects
-      return {
-        ...parsed,
-        arrivalTime: parsed.arrivalTime ? new Date(parsed.arrivalTime) : null,
-        bnaArrivalTime: parsed.bnaArrivalTime ? new Date(parsed.bnaArrivalTime) : null,
-        departureTime: parsed.departureTime ? new Date(parsed.departureTime) : null,
-        hotelDepartureTime: parsed.hotelDepartureTime ? new Date(parsed.hotelDepartureTime) : null
-      };
+const STORAGE_KEY = 'transportationFormData';
+
+const defaultValues = {
+  name: '',
+  email: '',
+  groupSize: undefined,
+  arrivalTransportation: '',
+  bnaArrivalTime: null,
+  arrivalTime: null,
+  departureTransportation: '',
+  hotelDepartureTime: null,
+  departureTime: null,
+  additionalNotes: ''
+};
+
+const schema = z
+  .object({
+    name: z.string().trim().min(1, 'Please enter your name'),
+    email: z.string().trim().min(1, 'Please enter your email').email('Please enter a valid email'),
+    groupSize: z
+      .number({ required_error: 'Please enter your group size', invalid_type_error: 'Please enter a valid group size' })
+      .int('Please enter a valid group size')
+      .min(1, 'Please enter a valid group size'),
+    arrivalTransportation: z.enum(['yes', 'no'], {
+      required_error: 'Please select if you need arrival transportation'
+    }),
+    bnaArrivalTime: z.date().nullable(),
+    arrivalTime: z.date().nullable(),
+    departureTransportation: z.enum(['yes', 'no'], {
+      required_error: 'Please select if you need departure transportation'
+    }),
+    hotelDepartureTime: z.date().nullable(),
+    departureTime: z.date().nullable(),
+    additionalNotes: z.string().optional()
+  })
+  .superRefine((values, ctx) => {
+    if (values.arrivalTransportation === 'yes' && !values.bnaArrivalTime) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['bnaArrivalTime'],
+        message: 'Please specify when the car will arrive at BNA'
+      });
     }
-    return {
-      name: '',
-      email: '',
-      groupSize: '',
-      arrivalTransportation: '',
-      bnaArrivalTime: null,
-      arrivalTime: null,
-      departureTransportation: '',
-      hotelDepartureTime: null,
-      departureTime: null,
-      additionalNotes: ''
-    };
+
+    if (values.arrivalTransportation === 'no' && !values.arrivalTime) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['arrivalTime'],
+        message: 'Please specify your arrival time at Alila'
+      });
+    }
+
+    if (values.departureTransportation === 'yes' && !values.hotelDepartureTime) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['hotelDepartureTime'],
+        message: 'Please specify when you plan to leave the hotel'
+      });
+    }
+
+    if (values.departureTransportation === 'no' && !values.departureTime) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['departureTime'],
+        message: 'Please specify your departure time from Alila'
+      });
+    }
   });
 
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const deserialize = (raw) => {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    const parsedGroupSize = parsed?.groupSize;
+    const groupSize =
+      typeof parsedGroupSize === 'number'
+        ? (Number.isFinite(parsedGroupSize) ? parsedGroupSize : undefined)
+        : typeof parsedGroupSize === 'string' && parsedGroupSize.trim() !== ''
+          ? Number(parsedGroupSize)
+          : undefined;
+    return {
+      ...defaultValues,
+      ...parsed,
+      groupSize: typeof groupSize === 'number' && Number.isFinite(groupSize) ? groupSize : undefined,
+      bnaArrivalTime: parsed?.bnaArrivalTime ? new Date(parsed.bnaArrivalTime) : null,
+      arrivalTime: parsed?.arrivalTime ? new Date(parsed.arrivalTime) : null,
+      hotelDepartureTime: parsed?.hotelDepartureTime ? new Date(parsed.hotelDepartureTime) : null,
+      departureTime: parsed?.departureTime ? new Date(parsed.departureTime) : null
+    };
+  } catch {
+    return null;
+  }
+};
+
+const serialize = (values) => ({
+  ...values,
+  groupSize: typeof values.groupSize === 'number' && Number.isFinite(values.groupSize) ? values.groupSize : null,
+  bnaArrivalTime: values.bnaArrivalTime ? values.bnaArrivalTime.toISOString() : null,
+  arrivalTime: values.arrivalTime ? values.arrivalTime.toISOString() : null,
+  hotelDepartureTime: values.hotelDepartureTime ? values.hotelDepartureTime.toISOString() : null,
+  departureTime: values.departureTime ? values.departureTime.toISOString() : null
+});
+
+const TransportationForm = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
+
+  const initialValues = useMemo(() => {
+    const saved = deserialize(localStorage.getItem(STORAGE_KEY));
+    return saved ?? defaultValues;
+  }, []);
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    clearErrors,
+    formState: { errors, isSubmitting }
+  } = useForm({
+    defaultValues: initialValues,
+    resolver: zodResolver(schema),
+    mode: 'onSubmit'
+  });
+
+  const arrivalTransportation = watch('arrivalTransportation');
+  const departureTransportation = watch('departureTransportation');
+  const allValues = watch();
 
   // Save form data to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('transportationFormData', JSON.stringify(formData));
-  }, [formData]);
-
-  const formatDate = (date) => {
-    if (!date) return '';
-    const d = new Date(date);
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    const year = d.getFullYear();
-    return `${month}/${day}/${year}`;
-  };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(serialize(allValues)));
+  }, [allValues]);
 
   const formatTime = (date) => {
     if (!date) return '';
@@ -63,94 +153,23 @@ const TransportationForm = () => {
     return `${hours}:${minutes} ${ampm}`;
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: null
-      }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = 'Please enter your name';
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Please enter your email';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
-    }
-
-    if (!formData.groupSize) {
-      newErrors.groupSize = 'Please enter your group size';
-    } else if (isNaN(formData.groupSize) || parseInt(formData.groupSize) < 1) {
-      newErrors.groupSize = 'Please enter a valid group size';
-    }
-
-    if (!formData.arrivalTransportation) {
-      newErrors.arrivalTransportation = 'Please select if you need arrival transportation';
-    }
-
-    if (formData.arrivalTransportation === 'yes' && !formData.bnaArrivalTime) {
-      newErrors.bnaArrivalTime = 'Please specify when the car will arrive at BNA';
-    }
-
-    if (formData.arrivalTransportation === 'no' && !formData.arrivalTime) {
-      newErrors.arrivalTime = 'Please specify your arrival time at Alila';
-    }
-
-    if (!formData.departureTransportation) {
-      newErrors.departureTransportation = 'Please select if you need departure transportation';
-    }
-
-    if (formData.departureTransportation === 'yes' && !formData.hotelDepartureTime) {
-      newErrors.hotelDepartureTime = 'Please specify when you plan to leave the hotel';
-    }
-
-    if (formData.departureTransportation === 'no' && !formData.departureTime) {
-      newErrors.departureTime = 'Please specify your departure time from Alila';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    setIsSubmitting(true);
-
+  const onSubmit = async (values) => {
     try {
       // Replace this URL with your Google Apps Script Web App URL
       const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw5UBs1krBoKn4toa6Ym3SMGdn7yRx-jM27zocNF1QfFLhlagY7tcyxnedoVJrmgm_x4w/exec';
       
       const submissionData = {
         timestamp: new Date().toISOString(),
-        name: formData.name,
-        email: formData.email,
-        groupSize: formData.groupSize,
-        arrivalTransportation: formData.arrivalTransportation,
-        bnaArrivalTime: formData.arrivalTransportation === 'yes' ? formatTime(formData.bnaArrivalTime) : 'N/A',
-        arrivalTime: formData.arrivalTransportation === 'no' ? formatTime(formData.arrivalTime) : 'N/A',
-        departureTransportation: formData.departureTransportation,
-        hotelDepartureTime: formData.departureTransportation === 'yes' ? formatTime(formData.hotelDepartureTime) : 'N/A',
-        departureTime: formData.departureTransportation === 'no' ? formatTime(formData.departureTime) : 'N/A',
-        additionalNotes: formData.additionalNotes || 'None'
+        name: values.name,
+        email: values.email,
+        groupSize: String(values.groupSize),
+        arrivalTransportation: values.arrivalTransportation,
+        bnaArrivalTime: values.arrivalTransportation === 'yes' ? formatTime(values.bnaArrivalTime) : 'N/A',
+        arrivalTime: values.arrivalTransportation === 'no' ? formatTime(values.arrivalTime) : 'N/A',
+        departureTransportation: values.departureTransportation,
+        hotelDepartureTime: values.departureTransportation === 'yes' ? formatTime(values.hotelDepartureTime) : 'N/A',
+        departureTime: values.departureTransportation === 'no' ? formatTime(values.departureTime) : 'N/A',
+        additionalNotes: values.additionalNotes?.trim() ? values.additionalNotes.trim() : 'None'
       };
 
       console.log('Submitting data:', submissionData);
@@ -197,28 +216,15 @@ const TransportationForm = () => {
       setTimeout(() => {
         setShowConfirmation(true);
         // Clear localStorage after successful submission
-        localStorage.removeItem('transportationFormData');
+        localStorage.removeItem(STORAGE_KEY);
       }, 500);
       
       // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        groupSize: '',
-        arrivalTransportation: '',
-        bnaArrivalTime: null,
-        arrivalTime: null,
-        departureTransportation: '',
-        hotelDepartureTime: null,
-        departureTime: null,
-        additionalNotes: ''
-      });
+      reset(defaultValues);
 
     } catch (error) {
       console.error('Error submitting form:', error);
       alert('There was an error submitting your information. Please try again or contact us directly.');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -252,7 +258,7 @@ const TransportationForm = () => {
 
   return (
     <motion.form 
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -282,13 +288,11 @@ const TransportationForm = () => {
         <input
           type="text"
           id="name"
-          name="name"
           className="form-input"
-          value={formData.name}
-          onChange={handleChange}
+          {...register('name', { onChange: () => clearErrors('name') })}
           placeholder="Enter your full name"
         />
-        {errors.name && <span className="form-error">{errors.name}</span>}
+        {errors.name && <span className="form-error">{errors.name.message}</span>}
       </motion.div>
 
       <motion.div 
@@ -304,13 +308,11 @@ const TransportationForm = () => {
         <input
           type="email"
           id="email"
-          name="email"
           className="form-input"
-          value={formData.email}
-          onChange={handleChange}
+          {...register('email', { onChange: () => clearErrors('email') })}
           placeholder="your.email@example.com"
         />
-        {errors.email && <span className="form-error">{errors.email}</span>}
+        {errors.email && <span className="form-error">{errors.email.message}</span>}
       </motion.div>
 
       <motion.div 
@@ -326,14 +328,15 @@ const TransportationForm = () => {
         <input
           type="number"
           id="groupSize"
-          name="groupSize"
           className="form-input"
-          value={formData.groupSize}
-          onChange={handleChange}
           placeholder="Enter number of people"
           min="1"
+          {...register('groupSize', {
+            valueAsNumber: true,
+            onChange: () => clearErrors('groupSize')
+          })}
         />
-        {errors.groupSize && <span className="form-error">{errors.groupSize}</span>}
+        {errors.groupSize && <span className="form-error">{errors.groupSize.message}</span>}
       </motion.div>
 
       <motion.div 
@@ -351,10 +354,13 @@ const TransportationForm = () => {
             <input
               type="radio"
               id="arrival-yes"
-              name="arrivalTransportation"
               value="yes"
-              checked={formData.arrivalTransportation === 'yes'}
-              onChange={handleChange}
+              {...register('arrivalTransportation', {
+                onChange: () => {
+                  clearErrors('arrivalTransportation');
+                  clearErrors(['bnaArrivalTime', 'arrivalTime']);
+                }
+              })}
             />
             <label htmlFor="arrival-yes">Yes, I need transportation</label>
           </div>
@@ -362,21 +368,24 @@ const TransportationForm = () => {
             <input
               type="radio"
               id="arrival-no"
-              name="arrivalTransportation"
               value="no"
-              checked={formData.arrivalTransportation === 'no'}
-              onChange={handleChange}
+              {...register('arrivalTransportation', {
+                onChange: () => {
+                  clearErrors('arrivalTransportation');
+                  clearErrors(['bnaArrivalTime', 'arrivalTime']);
+                }
+              })}
             />
             <label htmlFor="arrival-no">No, I'll arrange my own</label>
           </div>
         </div>
         {errors.arrivalTransportation && (
-          <span className="form-error">{errors.arrivalTransportation}</span>
+          <span className="form-error">{errors.arrivalTransportation.message}</span>
         )}
       </motion.div>
 
       <AnimatePresence>
-        {formData.arrivalTransportation === 'yes' && (
+        {arrivalTransportation === 'yes' && (
           <motion.div 
             className="conditional-field"
             initial={{ opacity: 0, height: 0 }}
@@ -390,33 +399,35 @@ const TransportationForm = () => {
                 <FaClock style={{ marginRight: '8px', color: 'var(--champagne)' }} />
                 When do you expect the car to arrive in BNA?
               </label>
-              <DatePicker
-                id="bnaArrivalTime"
-                selected={formData.bnaArrivalTime}
-                onChange={(date) => {
-                  setFormData(prev => ({ ...prev, bnaArrivalTime: date }));
-                  if (errors.bnaArrivalTime) {
-                    setErrors(prev => ({ ...prev, bnaArrivalTime: null }));
-                  }
-                }}
-                showTimeSelect
-                showTimeSelectOnly
-                timeIntervals={15}
-                timeCaption="Time"
-                dateFormat="h:mm aa"
-                placeholderText="Select BNA arrival time"
-                className="form-input"
+              <Controller
+                name="bnaArrivalTime"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    id="bnaArrivalTime"
+                    selected={field.value}
+                    onChange={(date) => {
+                      field.onChange(date);
+                      clearErrors('bnaArrivalTime');
+                    }}
+                    showTimeSelect
+                    showTimeSelectOnly
+                    timeIntervals={15}
+                    timeCaption="Time"
+                    dateFormat="h:mm aa"
+                    placeholderText="Select BNA arrival time"
+                    className="form-input"
+                  />
+                )}
               />
-              {errors.bnaArrivalTime && (
-                <span className="form-error">{errors.bnaArrivalTime}</span>
-              )}
+              {errors.bnaArrivalTime && <span className="form-error">{errors.bnaArrivalTime.message}</span>}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       <AnimatePresence>
-        {formData.arrivalTransportation === 'no' && (
+        {arrivalTransportation === 'no' && (
           <motion.div 
             className="conditional-field"
             initial={{ opacity: 0, height: 0 }}
@@ -430,26 +441,28 @@ const TransportationForm = () => {
                 <FaClock style={{ marginRight: '8px', color: 'var(--champagne)' }} />
                 Around what time will you arrive at Alila on June 13th?
               </label>
-              <DatePicker
-                id="arrivalTime"
-                selected={formData.arrivalTime}
-                onChange={(date) => {
-                  setFormData(prev => ({ ...prev, arrivalTime: date }));
-                  if (errors.arrivalTime) {
-                    setErrors(prev => ({ ...prev, arrivalTime: null }));
-                  }
-                }}
-                showTimeSelect
-                showTimeSelectOnly
-                timeIntervals={15}
-                timeCaption="Time"
-                dateFormat="h:mm aa"
-                placeholderText="Select arrival time at Alila"
-                className="form-input"
+              <Controller
+                name="arrivalTime"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    id="arrivalTime"
+                    selected={field.value}
+                    onChange={(date) => {
+                      field.onChange(date);
+                      clearErrors('arrivalTime');
+                    }}
+                    showTimeSelect
+                    showTimeSelectOnly
+                    timeIntervals={15}
+                    timeCaption="Time"
+                    dateFormat="h:mm aa"
+                    placeholderText="Select arrival time at Alila"
+                    className="form-input"
+                  />
+                )}
               />
-              {errors.arrivalTime && (
-                <span className="form-error">{errors.arrivalTime}</span>
-              )}
+              {errors.arrivalTime && <span className="form-error">{errors.arrivalTime.message}</span>}
             </div>
           </motion.div>
         )}
@@ -470,10 +483,13 @@ const TransportationForm = () => {
             <input
               type="radio"
               id="departure-yes"
-              name="departureTransportation"
               value="yes"
-              checked={formData.departureTransportation === 'yes'}
-              onChange={handleChange}
+              {...register('departureTransportation', {
+                onChange: () => {
+                  clearErrors('departureTransportation');
+                  clearErrors(['hotelDepartureTime', 'departureTime']);
+                }
+              })}
             />
             <label htmlFor="departure-yes">Yes, I need transportation</label>
           </div>
@@ -481,21 +497,24 @@ const TransportationForm = () => {
             <input
               type="radio"
               id="departure-no"
-              name="departureTransportation"
               value="no"
-              checked={formData.departureTransportation === 'no'}
-              onChange={handleChange}
+              {...register('departureTransportation', {
+                onChange: () => {
+                  clearErrors('departureTransportation');
+                  clearErrors(['hotelDepartureTime', 'departureTime']);
+                }
+              })}
             />
             <label htmlFor="departure-no">No, I'll arrange my own</label>
           </div>
         </div>
         {errors.departureTransportation && (
-          <span className="form-error">{errors.departureTransportation}</span>
+          <span className="form-error">{errors.departureTransportation.message}</span>
         )}
       </motion.div>
 
       <AnimatePresence>
-        {formData.departureTransportation === 'yes' && (
+        {departureTransportation === 'yes' && (
           <motion.div 
             className="conditional-field"
             initial={{ opacity: 0, height: 0 }}
@@ -509,33 +528,35 @@ const TransportationForm = () => {
                 <FaClock style={{ marginRight: '8px', color: 'var(--champagne)' }} />
                 When do you plan to leave from the hotel to the airport?
               </label>
-              <DatePicker
-                id="hotelDepartureTime"
-                selected={formData.hotelDepartureTime}
-                onChange={(date) => {
-                  setFormData(prev => ({ ...prev, hotelDepartureTime: date }));
-                  if (errors.hotelDepartureTime) {
-                    setErrors(prev => ({ ...prev, hotelDepartureTime: null }));
-                  }
-                }}
-                showTimeSelect
-                showTimeSelectOnly
-                timeIntervals={15}
-                timeCaption="Time"
-                dateFormat="h:mm aa"
-                placeholderText="Select hotel departure time"
-                className="form-input"
+              <Controller
+                name="hotelDepartureTime"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    id="hotelDepartureTime"
+                    selected={field.value}
+                    onChange={(date) => {
+                      field.onChange(date);
+                      clearErrors('hotelDepartureTime');
+                    }}
+                    showTimeSelect
+                    showTimeSelectOnly
+                    timeIntervals={15}
+                    timeCaption="Time"
+                    dateFormat="h:mm aa"
+                    placeholderText="Select hotel departure time"
+                    className="form-input"
+                  />
+                )}
               />
-              {errors.hotelDepartureTime && (
-                <span className="form-error">{errors.hotelDepartureTime}</span>
-              )}
+              {errors.hotelDepartureTime && <span className="form-error">{errors.hotelDepartureTime.message}</span>}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       <AnimatePresence>
-        {formData.departureTransportation === 'no' && (
+        {departureTransportation === 'no' && (
           <motion.div 
             className="conditional-field"
             initial={{ opacity: 0, height: 0 }}
@@ -549,26 +570,28 @@ const TransportationForm = () => {
                 <FaClock style={{ marginRight: '8px', color: 'var(--champagne)' }} />
                 Around what time will you leave Alila on June 15th?
               </label>
-              <DatePicker
-                id="departureTime"
-                selected={formData.departureTime}
-                onChange={(date) => {
-                  setFormData(prev => ({ ...prev, departureTime: date }));
-                  if (errors.departureTime) {
-                    setErrors(prev => ({ ...prev, departureTime: null }));
-                  }
-                }}
-                showTimeSelect
-                showTimeSelectOnly
-                timeIntervals={15}
-                timeCaption="Time"
-                dateFormat="h:mm aa"
-                placeholderText="Select Alila departure time"
-                className="form-input"
+              <Controller
+                name="departureTime"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    id="departureTime"
+                    selected={field.value}
+                    onChange={(date) => {
+                      field.onChange(date);
+                      clearErrors('departureTime');
+                    }}
+                    showTimeSelect
+                    showTimeSelectOnly
+                    timeIntervals={15}
+                    timeCaption="Time"
+                    dateFormat="h:mm aa"
+                    placeholderText="Select Alila departure time"
+                    className="form-input"
+                  />
+                )}
               />
-              {errors.departureTime && (
-                <span className="form-error">{errors.departureTime}</span>
-              )}
+              {errors.departureTime && <span className="form-error">{errors.departureTime.message}</span>}
             </div>
           </motion.div>
         )}
@@ -585,10 +608,8 @@ const TransportationForm = () => {
         </label>
         <textarea
           id="additionalNotes"
-          name="additionalNotes"
           className="form-textarea"
-          value={formData.additionalNotes}
-          onChange={handleChange}
+          {...register('additionalNotes')}
           placeholder="Accommodations, preferences, etc."
         />
       </motion.div>

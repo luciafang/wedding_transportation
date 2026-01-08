@@ -31,20 +31,25 @@
   --space-sm: 16px;
   --space-md: 32px;
   --space-lg: 64px;
+
+  /* Typography */
+  --font-sans: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Playfair Display Variable', 'Playfair Display', ui-serif, Georgia, 'Times New Roman', serif;
 }
 
 /* Base Styles */
 html {
-  background: var(--background);
+  background: var(--bg);
   scroll-behavior: smooth;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
   color: var(--accent);
-  background: var(--bg);
+  background: radial-gradient(1200px 600px at 50% -20%, rgba(201, 184, 148, 0.22) 0%, rgba(201, 184, 148, 0.0) 55%),
+    linear-gradient(180deg, var(--champagne-subtle) 0%, var(--bg) 55%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -59,9 +64,18 @@ body {
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-serif);
   font-weight: 400;
   line-height: 1.2;
+}
+
+::selection {
+  background: rgba(201, 184, 148, 0.35);
+}
+
+:focus-visible {
+  outline: 2px solid rgba(201, 184, 148, 0.85);
+  outline-offset: 3px;
 }
 
 a {
