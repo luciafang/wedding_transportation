@@ -156,7 +156,7 @@ const TransportationForm = () => {
   const onSubmit = async (values) => {
     try {
       // Replace this URL with your Google Apps Script Web App URL
-      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw5UBs1krBoKn4toa6Ym3SMGdn7yRx-jM27zocNF1QfFLhlagY7tcyxnedoVJrmgm_x4w/exec';
+      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyEO0-1Q1GUTFSc1VsQJQ3xKcvzEvNsJpC4mxnoxSvVDPbZ3tIyXWDU50ykTfdS3VzI5A/exec';
       
       const submissionData = {
         timestamp: new Date().toISOString(),
