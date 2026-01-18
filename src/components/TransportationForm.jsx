@@ -155,9 +155,6 @@ const TransportationForm = () => {
 
   const onSubmit = async (values) => {
     try {
-      // Replace this URL with your Google Apps Script Web App URL
-      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyEO0-1Q1GUTFSc1VsQJQ3xKcvzEvNsJpC4mxnoxSvVDPbZ3tIyXWDU50ykTfdS3VzI5A/exec';
-      
       const submissionData = {
         timestamp: new Date().toISOString(),
         name: values.name,
@@ -172,59 +169,35 @@ const TransportationForm = () => {
         additionalNotes: values.additionalNotes?.trim() ? values.additionalNotes.trim() : 'None'
       };
 
-      console.log('Submitting data:', submissionData);
-
-      // Create a form element to submit via redirect method (works with Google Apps Script)
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = GOOGLE_SCRIPT_URL;
-      form.target = 'hidden_iframe';
-      
-      // Add hidden input for each field
-      Object.keys(submissionData).forEach(key => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = submissionData[key];
-        form.appendChild(input);
-        console.log(`Field: ${key} = ${submissionData[key]}`);
+      const response = await fetch('/api/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(submissionData)
       });
-      
-      // Create hidden iframe if it doesn't exist
-      let iframe = document.querySelector('iframe[name="hidden_iframe"]');
-      if (!iframe) {
-        iframe = document.createElement('iframe');
-        iframe.name = 'hidden_iframe';
-        iframe.style.display = 'none';
-        
-        // Add load event listener to iframe to detect submission
-        iframe.onload = function() {
-          console.log('Form submitted successfully to Google Apps Script');
-        };
-        
-        document.body.appendChild(iframe);
+
+      const result = await response.json().catch(() => null);
+      if (!response.ok || !result || result.status !== 'success') {
+        throw new Error(
+          (result && (result.message || (result.upstreamBody && result.upstreamBody.message) || (result.upstream && result.upstream.message))) ||
+            'There was an error submitting your information. Please try again or contact us directly.'
+        );
       }
-      
-      console.log('Submitting form to:', GOOGLE_SCRIPT_URL);
-      
-      // Append form and submit
-      document.body.appendChild(form);
-      form.submit();
-      document.body.removeChild(form);
-      
-      // Show confirmation after a brief delay
-      setTimeout(() => {
-        setShowConfirmation(true);
-        // Clear localStorage after successful submission
-        localStorage.removeItem(STORAGE_KEY);
-      }, 500);
+
+      setShowConfirmation(true);
+      localStorage.removeItem(STORAGE_KEY);
       
       // Reset form
       reset(defaultValues);
 
     } catch (error) {
       console.error('Error submitting form:', error);
-      alert('There was an error submitting your information. Please try again or contact us directly.');
+      alert(
+        error && error.message
+          ? error.message
+          : 'There was an error submitting your information. Please try again or contact us directly.'
+      );
     }
   };
 
