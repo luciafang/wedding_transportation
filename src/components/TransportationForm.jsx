@@ -82,6 +82,13 @@ const schema = z
             message: 'Please arrive after 3:00 PM'
           });
         }
+        if (totalMins > 1020) { // After 5:00 PM (1020)
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['arrivalTime'],
+            message: 'Please arrive before 5:00 PM'
+          });
+        }
       }
     }
 
@@ -282,11 +289,11 @@ arrivalMinTime.setHours(13, 0, 0, 0);
 const arrivalMaxTime = new Date();
 arrivalMaxTime.setHours(15, 0, 0, 0);
 
-// Self-arrival at Alila (June 13): after 3:00 PM
+// Self-arrival at Alila (June 13): 3:00 PM – 5:00 PM
 const alilaArrivalMinTime = new Date();
 alilaArrivalMinTime.setHours(15, 0, 0, 0);
 const alilaArrivalMaxTime = new Date();
-alilaArrivalMaxTime.setHours(23, 45, 0, 0);
+alilaArrivalMaxTime.setHours(17, 0, 0, 0);
 
 // Shuttle departure (June 15): 12:00 PM – 2:00 PM
 const departureMinTime = new Date();
@@ -661,7 +668,7 @@ const TransportationForm = () => {
                     timeIntervals={15}
                     timeCaption="Time"
                     dateFormat="h:mm aa"
-                    placeholderText="After 3:00 PM"
+                    placeholderText="Between 3:00 PM – 5:00 PM"
                     minTime={alilaArrivalMinTime}
                     maxTime={alilaArrivalMaxTime}
                     className="form-input"
