@@ -1,6 +1,9 @@
 .App {
   min-height: 100vh;
   width: 100%;
+  max-width: 100vw;
+  margin: 0 auto;
+  overflow-x: hidden;
 }
 
 /* ═══════════════════════════════════════════
@@ -58,12 +61,15 @@
 
 .hero-content {
   text-align: center;
+  width: 100%;
   max-width: 100%;
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Blobs */
@@ -719,13 +725,35 @@
 }
 
 @media (max-width: 480px) {
-  .hero { padding: 36px 16px 64px; }
-  .form-section { padding: 32px 12px 28px; }
+  .hero {
+    padding: 36px 16px 64px;
+    align-items: center;
+    justify-content: center;
+  }
+  .form-section {
+    padding: 32px 12px 28px;
+    display: flex;
+    justify-content: center;
+  }
+  .form-container {
+    width: 100%;
+    margin: 0 auto;
+  }
   .form-card { padding: 20px 14px; }
   .radio-group { flex-direction: column; gap: 8px; }
-  .chip-row { gap: 6px; }
+  .chip-row { gap: 6px; justify-content: center; }
   .chip { padding: 6px 12px; }
   .scroll-hint { bottom: 16px; }
-  .dress-tip { padding: 8px 14px 8px 12px; gap: 6px; max-width: 100%; }
+  .dress-tip { padding: 8px 14px 8px 12px; gap: 6px; max-width: 100%; margin-left: auto; margin-right: auto; }
   .dress-tip-desc { font-size: 0.72rem; }
+  .footer { padding: 18px 16px 24px; }
+}
+
+/* iPhone SE and very small screens */
+@media (max-width: 375px) {
+  .hero { padding: 28px 12px 56px; }
+  .form-section { padding: 24px 8px 20px; }
+  .form-card { padding: 16px 12px; }
+  .chip { padding: 5px 10px; font-size: 0.68rem; }
+  .dress-tip { max-width: calc(100% - 8px); }
 }
