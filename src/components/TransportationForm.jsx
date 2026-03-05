@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { FaClock, FaUsers, FaBus, FaCheckCircle, FaEnvelope } from 'react-icons/fa';
 import 'react-datepicker/dist/react-datepicker.css';
 import './DatePicker.css';
 
@@ -111,6 +110,129 @@ const serialize = (values) => ({
   departureTime: values.departureTime ? values.departureTime.toISOString() : null
 });
 
+// ── SVG Icon Components ──────────────────────────────────────
+const IconPerson = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }}>
+    <circle cx="8" cy="5" r="3" stroke="var(--green)" strokeWidth="1.4" />
+    <path d="M2.5 14C2.5 11 4.5 9 8 9C11.5 9 13.5 11 13.5 14" stroke="var(--green)" strokeWidth="1.4" strokeLinecap="round" />
+  </svg>
+);
+
+const IconEnvelope = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }}>
+    <rect x="1.5" y="3.5" width="13" height="9" rx="2" stroke="var(--teal)" strokeWidth="1.4" />
+    <path d="M1.5 5L8 9.5L14.5 5" stroke="var(--teal)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const IconPeople = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }}>
+    <circle cx="6" cy="5" r="2.5" stroke="var(--green)" strokeWidth="1.3" />
+    <path d="M1.5 13C1.5 10.5 3.2 9 6 9C8.8 9 10.5 10.5 10.5 13" stroke="var(--green)" strokeWidth="1.3" strokeLinecap="round" />
+    <circle cx="11" cy="5.5" r="2" stroke="var(--teal)" strokeWidth="1.2" />
+    <path d="M8.5 13C8.5 11 9.5 9.5 11 9.5C12.5 9.5 14 11 14 13" stroke="var(--teal)" strokeWidth="1.2" strokeLinecap="round" />
+  </svg>
+);
+
+const IconShuttle = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }}>
+    <rect x="1" y="4" width="14" height="7" rx="2" stroke="var(--green)" strokeWidth="1.4" />
+    <rect x="2.5" y="5.5" width="3" height="2.5" rx="0.5" fill="var(--teal-light)" />
+    <rect x="6.5" y="5.5" width="3" height="2.5" rx="0.5" fill="var(--teal-light)" />
+    <rect x="10.5" y="5.5" width="3" height="2.5" rx="0.5" fill="var(--teal-light)" />
+    <circle cx="4.5" cy="12" r="1.2" fill="var(--green)" />
+    <circle cx="11.5" cy="12" r="1.2" fill="var(--green)" />
+    <line x1="1" y1="12" x2="15" y2="12" stroke="var(--green)" strokeWidth="0.8" />
+  </svg>
+);
+
+const IconClock = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }}>
+    <circle cx="8" cy="8" r="6" stroke="var(--champagne)" strokeWidth="1.4" />
+    <line x1="8" y1="4.5" x2="8" y2="8" stroke="var(--champagne)" strokeWidth="1.4" strokeLinecap="round" />
+    <line x1="8" y1="8" x2="11" y2="10" stroke="var(--champagne)" strokeWidth="1.4" strokeLinecap="round" />
+    <circle cx="8" cy="8" r="0.8" fill="var(--champagne)" />
+  </svg>
+);
+
+const IconNotes = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }}>
+    <rect x="2" y="1.5" width="12" height="13" rx="2" stroke="var(--teal)" strokeWidth="1.4" />
+    <line x1="5" y1="5" x2="11" y2="5" stroke="var(--teal)" strokeWidth="1.2" strokeLinecap="round" />
+    <line x1="5" y1="8" x2="11" y2="8" stroke="var(--teal)" strokeWidth="1.2" strokeLinecap="round" />
+    <line x1="5" y1="11" x2="9" y2="11" stroke="var(--teal)" strokeWidth="1.2" strokeLinecap="round" />
+  </svg>
+);
+
+const IconSuitcase = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }}>
+    <rect x="2" y="5" width="12" height="8" rx="2" stroke="var(--champagne)" strokeWidth="1.4" />
+    <path d="M5.5 5V3.5C5.5 2.67 6.17 2 7 2H9C9.83 2 10.5 2.67 10.5 3.5V5" stroke="var(--champagne)" strokeWidth="1.4" />
+    <line x1="2" y1="9" x2="14" y2="9" stroke="var(--champagne)" strokeWidth="1" opacity="0.5" />
+  </svg>
+);
+
+const IconCheckCircle = () => (
+  <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+    <circle cx="20" cy="20" r="18" fill="var(--green)" />
+    <path d="M13 20L18 25L27 15" stroke="white" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const DecoLeaf = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="success-deco-leaf">
+    <path d="M10 2C10 2 4 6 4 12C4 16 7 18 10 18C13 18 16 16 16 12C16 6 10 2 10 2Z" fill="var(--green)" opacity="0.3" />
+    <path d="M10 5V16" stroke="var(--green)" strokeWidth="0.8" opacity="0.4" />
+  </svg>
+);
+
+// ── Animation variants ────────────────────────────────────────
+const formVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.05
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }
+  }
+};
+
+const conditionalVariants = {
+  initial: { opacity: 0, height: 0, y: -8 },
+  animate: {
+    opacity: 1,
+    height: 'auto',
+    y: 0,
+    transition: { type: "spring", stiffness: 300, damping: 28 }
+  },
+  exit: {
+    opacity: 0,
+    height: 0,
+    y: -8,
+    transition: { duration: 0.25, ease: "easeIn" }
+  }
+};
+
+// ── Celebration particles (green + teal + champagne) ──────────
+const celebrationParticles = [
+  { type: 'heart', left: '15%', top: '60%', size: 16, color: 'rgba(92,184,138,0.5)', duration: 2.5, delay: 0.2, travel: -120, drift: -25, rotation: 120 },
+  { type: 'star', left: '30%', top: '50%', size: 13, color: 'rgba(91,190,181,0.4)', duration: 3, delay: 0.5, travel: -140, drift: 15, rotation: 200 },
+  { type: 'sparkle-dot', left: '45%', top: '55%', size: 7, color: 'rgba(92,184,138,0.55)', duration: 2.8, delay: 0.1, travel: -100, drift: -10, rotation: 90 },
+  { type: 'heart', left: '60%', top: '60%', size: 14, color: 'rgba(212,169,106,0.4)', duration: 3.2, delay: 0.7, travel: -130, drift: 30, rotation: 150 },
+  { type: 'sparkle-dot', left: '75%', top: '50%', size: 5, color: 'rgba(91,190,181,0.5)', duration: 2.6, delay: 0.3, travel: -110, drift: -20, rotation: 180 },
+  { type: 'star', left: '85%', top: '55%', size: 11, color: 'rgba(212,169,106,0.45)', duration: 2.9, delay: 0.6, travel: -105, drift: 18, rotation: 240 },
+];
+
 const TransportationForm = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -137,7 +259,6 @@ const TransportationForm = () => {
   const departureTransportation = watch('departureTransportation');
   const allValues = watch();
 
-  // Save form data to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(serialize(allValues)));
   }, [allValues]);
@@ -149,7 +270,7 @@ const TransportationForm = () => {
     const minutes = String(d.getMinutes()).padStart(2, '0');
     const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
-    hours = hours ? hours : 12; // Convert 0 to 12
+    hours = hours ? hours : 12;
     return `${hours}:${minutes} ${ampm}`;
   };
 
@@ -187,7 +308,6 @@ const TransportationForm = () => {
           alert(jsonResult.message || 'Sorry, there was an error submitting your information. Please try again.');
         }
       } catch (parseError) {
-        // Response parsing succeeded, assuming success
         setShowConfirmation(true);
         localStorage.removeItem(STORAGE_KEY);
         reset(defaultValues);
@@ -199,61 +319,106 @@ const TransportationForm = () => {
     }
   };
 
+  // ── Success / Celebration State ─────────────────────────────
   if (showConfirmation) {
     return (
-      <motion.div 
+      <motion.div
         className="success-message"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
       >
+        <div className="celebration-particles">
+          {celebrationParticles.map((p, i) => (
+            <div
+              key={i}
+              className={`celebration-particle ${p.type}`}
+              style={{
+                left: p.left,
+                top: p.top,
+                '--size': `${p.size}px`,
+                '--color': p.color,
+                '--duration': `${p.duration}s`,
+                '--delay': `${p.delay}s`,
+                '--travel': `${p.travel}px`,
+                '--drift': `${p.drift}px`,
+                '--rotation': `${p.rotation}deg`,
+              }}
+            />
+          ))}
+        </div>
+
         <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          className="success-icon-wrap"
+          initial={{ scale: 0, rotate: -20 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 12 }}
         >
-          <FaCheckCircle style={{ fontSize: '4rem', color: 'var(--champagne)', marginBottom: '1rem' }} />
+          <div className="success-icon-ring">
+            <IconCheckCircle />
+          </div>
         </motion.div>
-        <h2>Thank You!</h2>
-        <p>Your transportation information has been submitted successfully. We'll be in touch if we need any additional details.</p>
-        <button 
-          className="submit-btn" 
+
+        <motion.h2
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45, duration: 0.5 }}
+        >
+          You're All Set!
+        </motion.h2>
+
+        <motion.div
+          className="success-deco"
+          initial={{ opacity: 0, scaleX: 0 }}
+          animate={{ opacity: 1, scaleX: 1 }}
+          transition={{ delay: 0.55, duration: 0.4 }}
+        >
+          <span className="success-deco-line" />
+          <DecoLeaf />
+          <span className="success-deco-line" />
+        </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
+        >
+          Your transportation details have been received. We'll reach out if we need anything else!
+        </motion.p>
+
+        <motion.button
+          className="submit-btn"
           onClick={() => setShowConfirmation(false)}
-          style={{ maxWidth: '300px', margin: '32px auto 0' }}
+          style={{ maxWidth: '260px', margin: '20px auto 0' }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.4 }}
+          whileHover={{ scale: 1.03, y: -1 }}
+          whileTap={{ scale: 0.97 }}
         >
           Submit Another Response
-        </button>
+        </motion.button>
       </motion.div>
     );
   }
 
+  // ── Main Form ───────────────────────────────────────────────
   return (
-    <motion.form 
+    <motion.form
       onSubmit={handleSubmit(onSubmit)}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      variants={formVariants}
+      initial="hidden"
+      animate="visible"
     >
-      <motion.div 
-        className="info-box"
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.1, duration: 0.4 }}
-      >
-        <h3>Attire Recommendations</h3>
-        <p>
-        We recommend ladies bring 2-3 light-colored long dresses, and gentlemen bring 2-3 suits.
-        </p>
+      {/* Tip badge */}
+      <motion.div className="info-box" variants={itemVariants}>
+        <p><IconSuitcase /> Pack light — think linen suits, maxi dresses &amp; breathable fabrics</p>
       </motion.div>
 
-      <motion.div 
-        className="form-group"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.3 }}
-      >
+      {/* Full Name */}
+      <motion.div className="form-group" variants={itemVariants}>
         <label className="form-label form-label-required" htmlFor="name">
-          <span style={{ marginRight: '8px', color: 'var(--champagne)' }}>👤</span>
+          <IconPerson />
           Full Name
         </label>
         <input
@@ -266,15 +431,11 @@ const TransportationForm = () => {
         {errors.name && <span className="form-error">{errors.name.message}</span>}
       </motion.div>
 
-      <motion.div 
-        className="form-group"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.225, duration: 0.3 }}
-      >
+      {/* Email */}
+      <motion.div className="form-group" variants={itemVariants}>
         <label className="form-label form-label-required" htmlFor="email">
-          <FaEnvelope style={{ marginRight: '8px', color: 'var(--champagne)' }} />
-          Email Address
+          <IconEnvelope />
+          Email
         </label>
         <input
           type="email"
@@ -286,21 +447,17 @@ const TransportationForm = () => {
         {errors.email && <span className="form-error">{errors.email.message}</span>}
       </motion.div>
 
-      <motion.div 
-        className="form-group"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25, duration: 0.3 }}
-      >
+      {/* Group Size */}
+      <motion.div className="form-group" variants={itemVariants}>
         <label className="form-label form-label-required" htmlFor="groupSize">
-          <FaUsers style={{ marginRight: '8px', color: 'var(--champagne)' }} />
-          Party size (including yourself)
+          <IconPeople />
+          Party size
         </label>
         <input
           type="number"
           id="groupSize"
           className="form-input"
-          placeholder="Enter number of people"
+          placeholder="Including yourself"
           min="1"
           {...register('groupSize', {
             valueAsNumber: true,
@@ -310,15 +467,11 @@ const TransportationForm = () => {
         {errors.groupSize && <span className="form-error">{errors.groupSize.message}</span>}
       </motion.div>
 
-      <motion.div 
-        className="form-group"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.3 }}
-      >
+      {/* Arrival Transportation */}
+      <motion.div className="form-group" variants={itemVariants}>
         <label className="form-label form-label-required">
-          <FaBus style={{ marginRight: '8px', color: 'var(--champagne)' }} />
-          Do you need transportation from airport to hotel on June 13th?
+          <IconShuttle />
+          Airport → hotel on June 13?
         </label>
         <div className="radio-group">
           <div className="radio-option">
@@ -333,7 +486,7 @@ const TransportationForm = () => {
                 }
               })}
             />
-            <label htmlFor="arrival-yes">Yes, I need transportation</label>
+            <label htmlFor="arrival-yes">Yes please</label>
           </div>
           <div className="radio-option">
             <input
@@ -347,7 +500,7 @@ const TransportationForm = () => {
                 }
               })}
             />
-            <label htmlFor="arrival-no">No, I'll arrange my own</label>
+            <label htmlFor="arrival-no">No thanks</label>
           </div>
         </div>
         {errors.arrivalTransportation && (
@@ -355,19 +508,20 @@ const TransportationForm = () => {
         )}
       </motion.div>
 
+      {/* Arrival — conditional fields */}
       <AnimatePresence>
         {arrivalTransportation === 'yes' && (
-          <motion.div 
+          <motion.div
             className="conditional-field"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{ marginBottom: '32px' }}
+            variants={conditionalVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{ marginBottom: '16px' }}
           >
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label className="form-label form-label-required" htmlFor="bnaArrivalTime">
-                <FaClock style={{ marginRight: '8px', color: 'var(--champagne)' }} />
+                <IconClock />
                 When do you expect the car to arrive in BNA?
               </label>
               <Controller
@@ -399,17 +553,17 @@ const TransportationForm = () => {
 
       <AnimatePresence>
         {arrivalTransportation === 'no' && (
-          <motion.div 
+          <motion.div
             className="conditional-field"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{ marginBottom: '32px' }}
+            variants={conditionalVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{ marginBottom: '16px' }}
           >
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label className="form-label form-label-required" htmlFor="arrivalTime">
-                <FaClock style={{ marginRight: '8px', color: 'var(--champagne)' }} />
+                <IconClock />
                 Around what time will you arrive at Alila on June 13th?
               </label>
               <Controller
@@ -439,15 +593,11 @@ const TransportationForm = () => {
         )}
       </AnimatePresence>
 
-      <motion.div 
-        className="form-group"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35, duration: 0.3 }}
-      >
+      {/* Departure Transportation */}
+      <motion.div className="form-group" variants={itemVariants}>
         <label className="form-label form-label-required">
-          <FaBus style={{ marginRight: '8px', color: 'var(--champagne)' }} />
-          Do you need transportation from hotel to airport on June 15th?
+          <IconShuttle />
+          Hotel → airport on June 15?
         </label>
         <div className="radio-group">
           <div className="radio-option">
@@ -462,7 +612,7 @@ const TransportationForm = () => {
                 }
               })}
             />
-            <label htmlFor="departure-yes">Yes, I need transportation</label>
+            <label htmlFor="departure-yes">Yes please</label>
           </div>
           <div className="radio-option">
             <input
@@ -476,7 +626,7 @@ const TransportationForm = () => {
                 }
               })}
             />
-            <label htmlFor="departure-no">No, I'll arrange my own</label>
+            <label htmlFor="departure-no">No thanks</label>
           </div>
         </div>
         {errors.departureTransportation && (
@@ -484,20 +634,21 @@ const TransportationForm = () => {
         )}
       </motion.div>
 
+      {/* Departure — conditional fields */}
       <AnimatePresence>
         {departureTransportation === 'yes' && (
-          <motion.div 
+          <motion.div
             className="conditional-field"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{ marginBottom: '32px' }}
+            variants={conditionalVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{ marginBottom: '16px' }}
           >
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label className="form-label form-label-required" htmlFor="hotelDepartureTime">
-                <FaClock style={{ marginRight: '8px', color: 'var(--champagne)' }} />
-                When do you plan to leave from the hotel to the airport?
+                <IconClock />
+                When do you plan to leave from the hotel?
               </label>
               <Controller
                 name="hotelDepartureTime"
@@ -528,17 +679,17 @@ const TransportationForm = () => {
 
       <AnimatePresence>
         {departureTransportation === 'no' && (
-          <motion.div 
+          <motion.div
             className="conditional-field"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            style={{ marginBottom: '32px' }}
+            variants={conditionalVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{ marginBottom: '16px' }}
           >
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label className="form-label form-label-required" htmlFor="departureTime">
-                <FaClock style={{ marginRight: '8px', color: 'var(--champagne)' }} />
+                <IconClock />
                 Around what time will you leave Alila on June 15th?
               </label>
               <Controller
@@ -568,29 +719,38 @@ const TransportationForm = () => {
         )}
       </AnimatePresence>
 
-      <motion.div 
-        className="form-group"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.3 }}
-      >
+      {/* Additional Notes */}
+      <motion.div className="form-group" variants={itemVariants}>
         <label className="form-label" htmlFor="additionalNotes">
-        Anything else we should know?
+          <IconNotes />
+          Anything else?
         </label>
         <textarea
           id="additionalNotes"
           className="form-textarea"
           {...register('additionalNotes')}
-          placeholder="Accommodations, preferences, etc."
+          placeholder="Accommodations, preferences..."
+          style={{ marginBottom: '4px' }}
         />
       </motion.div>
 
-      <motion.button 
-        type="submit" 
-        className="submit-btn"
+      {/* Submit Button */}
+      <motion.button
+        type="submit"
+        className={`submit-btn ${isSubmitting ? 'submitting-shimmer' : ''}`}
         disabled={isSubmitting}
+        variants={itemVariants}
+        whileHover={!isSubmitting ? { scale: 1.02, y: -1 } : {}}
+        whileTap={!isSubmitting ? { scale: 0.98 } : {}}
       >
-        {isSubmitting ? 'Submitting...' : 'Submit Information'}
+        {isSubmitting ? 'Submitting...' : (
+          <>
+            Submit RSVP
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginLeft: 6, verticalAlign: 'middle' }}>
+              <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </>
+        )}
       </motion.button>
     </motion.form>
   );
