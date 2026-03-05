@@ -84,10 +84,11 @@ body {
   overflow-x: hidden;
   margin: 0;
   padding: 0;
-  /* Centre the scroll / content for all viewports */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  width: 100%;
+}
+
+#root {
+  width: 100%;
 }
 
 * {
