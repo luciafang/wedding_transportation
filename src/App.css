@@ -277,7 +277,7 @@
 .form-section {
   width: 100%;
   background: white;
-  padding: 0 24px 40px;
+  padding: 40px 24px 40px;
 }
 
 .form-container {
@@ -697,14 +697,14 @@
 
 @media (min-width: 768px) {
   .hero { padding: 60px 40px 90px; }
-  .form-section { padding: 0 40px 48px; }
+  .form-section { padding: 48px 40px 48px; }
   .form-card { padding: 32px 28px; }
   .scene { height: 180px; max-width: 360px; }
 }
 
 @media (min-width: 1024px) {
   .hero { padding: 72px 60px 100px; }
-  .form-section { padding: 0 60px 56px; }
+  .form-section { padding: 56px 60px 56px; }
   .form-container { max-width: 700px; }
   .scene { height: 200px; max-width: 400px; }
 }
@@ -717,7 +717,7 @@
 
 @media (max-width: 480px) {
   .hero { padding: 36px 16px 64px; }
-  .form-section { padding: 0 12px 28px; }
+  .form-section { padding: 32px 12px 28px; }
   .form-card { padding: 20px 14px; }
   .radio-group { flex-direction: column; gap: 8px; }
   .chip-row { gap: 6px; }

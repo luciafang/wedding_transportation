@@ -87,7 +87,7 @@ function App() {
               <path d="M9 6C9 6 9.5 8 11 8C12.5 8 13 6 13 6" stroke="var(--champagne)" strokeWidth="1" strokeLinecap="round" />
               <line x1="4" y1="20" x2="18" y2="20" stroke="var(--champagne)" strokeWidth="1.3" strokeLinecap="round" />
             </svg>
-            <span className="dress-tip-desc">Linen suits, maxi dresses &amp; flowy fabrics — keep it breezy!</span>
+            <span className="dress-tip-desc">Linen suits and maxi dresses — keep it breezy. Light, airy colors are preferred. We recommend bringing 2–3 outfits per person.</span>
           </motion.div>
         </motion.div>
 
