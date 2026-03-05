@@ -47,7 +47,7 @@ const schema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['bnaArrivalTime'],
-        message: 'Please specify when the car will arrive at BNA'
+        message: 'Please specify when the car will arrive at Bali airport'
       });
     }
 
@@ -522,7 +522,7 @@ const TransportationForm = () => {
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label className="form-label form-label-required" htmlFor="bnaArrivalTime">
                 <IconClock />
-                When do you expect the car to arrive in BNA?
+                When do you expect the car to arrive at Bali airport?
               </label>
               <Controller
                 name="bnaArrivalTime"
@@ -540,7 +540,7 @@ const TransportationForm = () => {
                     timeIntervals={15}
                     timeCaption="Time"
                     dateFormat="h:mm aa"
-                    placeholderText="Select BNA arrival time"
+                    placeholderText="Select Bali airport arrival time"
                     className="form-input"
                   />
                 )}
