@@ -248,26 +248,29 @@
 
 .dress-tip {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   margin-top: 16px;
-  padding: 8px 18px 8px 14px;
+  padding: 10px 18px 10px 14px;
   background: rgba(255,255,255,0.18);
   border: 1px solid rgba(255,255,255,0.35);
-  border-radius: 100px;
+  border-radius: 16px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  max-width: 420px;
+  text-align: left;
 }
 
 .dress-tip-icon {
   flex-shrink: 0;
   opacity: 0.75;
+  margin-top: 1px;
 }
 
 .dress-tip-desc {
   font-size: 0.78rem;
   color: var(--text-soft);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 /* ═══════════════════════════════════════════
@@ -723,6 +726,6 @@
   .chip-row { gap: 6px; }
   .chip { padding: 6px 12px; }
   .scroll-hint { bottom: 16px; }
-  .dress-tip { padding: 7px 14px 7px 12px; gap: 6px; }
+  .dress-tip { padding: 8px 14px 8px 12px; gap: 6px; max-width: 100%; }
   .dress-tip-desc { font-size: 0.72rem; }
 }
