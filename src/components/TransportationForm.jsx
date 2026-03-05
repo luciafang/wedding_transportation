@@ -43,12 +43,25 @@ const schema = z
     additionalNotes: z.string().optional()
   })
   .superRefine((values, ctx) => {
-    if (values.arrivalTransportation === 'yes' && !values.bnaArrivalTime) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['bnaArrivalTime'],
-        message: 'Please specify when the car will arrive at Bali airport'
-      });
+    if (values.arrivalTransportation === 'yes') {
+      if (!values.bnaArrivalTime) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['bnaArrivalTime'],
+          message: 'Please specify when the car will arrive at Bali airport'
+        });
+      } else {
+        const h = values.bnaArrivalTime.getHours();
+        const m = values.bnaArrivalTime.getMinutes();
+        const totalMins = h * 60 + m;
+        if (totalMins < 780 || totalMins > 1020) { // 1:00 PM (780) – 5:00 PM (1020)
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['bnaArrivalTime'],
+            message: 'Shuttle is available between 1:00 PM and 5:00 PM only'
+          });
+        }
+      }
     }
 
     if (values.arrivalTransportation === 'no' && !values.arrivalTime) {
@@ -59,12 +72,25 @@ const schema = z
       });
     }
 
-    if (values.departureTransportation === 'yes' && !values.hotelDepartureTime) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['hotelDepartureTime'],
-        message: 'Please specify when you plan to leave the hotel'
-      });
+    if (values.departureTransportation === 'yes') {
+      if (!values.hotelDepartureTime) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['hotelDepartureTime'],
+          message: 'Please specify when you plan to leave the hotel'
+        });
+      } else {
+        const h = values.hotelDepartureTime.getHours();
+        const m = values.hotelDepartureTime.getMinutes();
+        const totalMins = h * 60 + m;
+        if (totalMins > 840) { // After 2:00 PM (840)
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['hotelDepartureTime'],
+            message: 'Departure must be before 2:00 PM'
+          });
+        }
+      }
     }
 
     if (values.departureTransportation === 'no' && !values.departureTime) {
@@ -222,6 +248,19 @@ const conditionalVariants = {
     transition: { duration: 0.25, ease: "easeIn" }
   }
 };
+
+// ── Time range boundaries ────────────────────────────────────
+// Shuttle arrival: June 13, 1:00 PM – 5:00 PM
+const arrivalMinTime = new Date();
+arrivalMinTime.setHours(13, 0, 0, 0);
+const arrivalMaxTime = new Date();
+arrivalMaxTime.setHours(17, 0, 0, 0);
+
+// Shuttle departure: June 15, before 2:00 PM (start at midnight)
+const departureMinTime = new Date();
+departureMinTime.setHours(0, 0, 0, 0);
+const departureMaxTime = new Date();
+departureMaxTime.setHours(14, 0, 0, 0);
 
 // ── Celebration particles (green + teal + champagne) ──────────
 const celebrationParticles = [
@@ -540,7 +579,9 @@ const TransportationForm = () => {
                     timeIntervals={15}
                     timeCaption="Time"
                     dateFormat="h:mm aa"
-                    placeholderText="Select Bali airport arrival time"
+                    placeholderText="Between 1:00 PM – 5:00 PM"
+                    minTime={arrivalMinTime}
+                    maxTime={arrivalMaxTime}
                     className="form-input"
                   />
                 )}
@@ -666,7 +707,9 @@ const TransportationForm = () => {
                     timeIntervals={15}
                     timeCaption="Time"
                     dateFormat="h:mm aa"
-                    placeholderText="Select hotel departure time"
+                    placeholderText="Before 2:00 PM"
+                    minTime={departureMinTime}
+                    maxTime={departureMaxTime}
                     className="form-input"
                   />
                 )}
