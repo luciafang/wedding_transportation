@@ -54,22 +54,35 @@ const schema = z
         const h = values.bnaArrivalTime.getHours();
         const m = values.bnaArrivalTime.getMinutes();
         const totalMins = h * 60 + m;
-        if (totalMins < 780 || totalMins > 1020) { // 1:00 PM (780) – 5:00 PM (1020)
+        if (totalMins < 780 || totalMins > 900) { // 1:00 PM (780) – 3:00 PM (900)
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['bnaArrivalTime'],
-            message: 'Shuttle is available between 1:00 PM and 5:00 PM only'
+            message: 'Shuttle is available between 1:00 PM and 3:00 PM only'
           });
         }
       }
     }
 
-    if (values.arrivalTransportation === 'no' && !values.arrivalTime) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['arrivalTime'],
-        message: 'Please specify your arrival time at Alila'
-      });
+    if (values.arrivalTransportation === 'no') {
+      if (!values.arrivalTime) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['arrivalTime'],
+          message: 'Please specify your arrival time at Alila'
+        });
+      } else {
+        const h = values.arrivalTime.getHours();
+        const m = values.arrivalTime.getMinutes();
+        const totalMins = h * 60 + m;
+        if (totalMins < 900) { // Before 3:00 PM (900)
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['arrivalTime'],
+            message: 'Please arrive after 3:00 PM'
+          });
+        }
+      }
     }
 
     if (values.departureTransportation === 'yes') {
@@ -83,22 +96,35 @@ const schema = z
         const h = values.hotelDepartureTime.getHours();
         const m = values.hotelDepartureTime.getMinutes();
         const totalMins = h * 60 + m;
-        if (totalMins > 840) { // After 2:00 PM (840)
+        if (totalMins < 720 || totalMins > 840) { // 12:00 PM (720) – 2:00 PM (840)
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ['hotelDepartureTime'],
-            message: 'Departure must be before 2:00 PM'
+            message: 'Shuttle is available between 12:00 PM and 2:00 PM only'
           });
         }
       }
     }
 
-    if (values.departureTransportation === 'no' && !values.departureTime) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['departureTime'],
-        message: 'Please specify your departure time from Alila'
-      });
+    if (values.departureTransportation === 'no') {
+      if (!values.departureTime) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['departureTime'],
+          message: 'Please specify your departure time from Alila'
+        });
+      } else {
+        const h = values.departureTime.getHours();
+        const m = values.departureTime.getMinutes();
+        const totalMins = h * 60 + m;
+        if (totalMins > 840) { // After 2:00 PM (840)
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['departureTime'],
+            message: 'Please leave before 2:00 PM'
+          });
+        }
+      }
     }
   });
 
@@ -250,17 +276,29 @@ const conditionalVariants = {
 };
 
 // ── Time range boundaries ────────────────────────────────────
-// Shuttle arrival: June 13, 1:00 PM – 5:00 PM
+// Shuttle arrival (June 13): 1:00 PM – 3:00 PM
 const arrivalMinTime = new Date();
 arrivalMinTime.setHours(13, 0, 0, 0);
 const arrivalMaxTime = new Date();
-arrivalMaxTime.setHours(17, 0, 0, 0);
+arrivalMaxTime.setHours(15, 0, 0, 0);
 
-// Shuttle departure: June 15, before 2:00 PM (start at midnight)
+// Self-arrival at Alila (June 13): after 3:00 PM
+const alilaArrivalMinTime = new Date();
+alilaArrivalMinTime.setHours(15, 0, 0, 0);
+const alilaArrivalMaxTime = new Date();
+alilaArrivalMaxTime.setHours(23, 45, 0, 0);
+
+// Shuttle departure (June 15): 12:00 PM – 2:00 PM
 const departureMinTime = new Date();
-departureMinTime.setHours(0, 0, 0, 0);
+departureMinTime.setHours(12, 0, 0, 0);
 const departureMaxTime = new Date();
 departureMaxTime.setHours(14, 0, 0, 0);
+
+// Self-departure from Alila (June 15): before 2:00 PM
+const alilaDepartureMinTime = new Date();
+alilaDepartureMinTime.setHours(0, 0, 0, 0);
+const alilaDepartureMaxTime = new Date();
+alilaDepartureMaxTime.setHours(14, 0, 0, 0);
 
 // ── Celebration particles (green + teal + champagne) ──────────
 const celebrationParticles = [
@@ -579,7 +617,7 @@ const TransportationForm = () => {
                     timeIntervals={15}
                     timeCaption="Time"
                     dateFormat="h:mm aa"
-                    placeholderText="Between 1:00 PM – 5:00 PM"
+                    placeholderText="Between 1:00 PM – 3:00 PM"
                     minTime={arrivalMinTime}
                     maxTime={arrivalMaxTime}
                     className="form-input"
@@ -623,7 +661,9 @@ const TransportationForm = () => {
                     timeIntervals={15}
                     timeCaption="Time"
                     dateFormat="h:mm aa"
-                    placeholderText="Select arrival time at Alila"
+                    placeholderText="After 3:00 PM"
+                    minTime={alilaArrivalMinTime}
+                    maxTime={alilaArrivalMaxTime}
                     className="form-input"
                   />
                 )}
@@ -707,7 +747,7 @@ const TransportationForm = () => {
                     timeIntervals={15}
                     timeCaption="Time"
                     dateFormat="h:mm aa"
-                    placeholderText="Before 2:00 PM"
+                    placeholderText="Between 12:00 PM – 2:00 PM"
                     minTime={departureMinTime}
                     maxTime={departureMaxTime}
                     className="form-input"
@@ -751,7 +791,9 @@ const TransportationForm = () => {
                     timeIntervals={15}
                     timeCaption="Time"
                     dateFormat="h:mm aa"
-                    placeholderText="Select Alila departure time"
+                    placeholderText="Before 2:00 PM"
+                    minTime={alilaDepartureMinTime}
+                    maxTime={alilaDepartureMaxTime}
                     className="form-input"
                   />
                 )}
@@ -766,7 +808,7 @@ const TransportationForm = () => {
       <motion.div className="form-group" variants={itemVariants}>
         <label className="form-label" htmlFor="additionalNotes">
           <IconNotes />
-          Anything else you would like us to know?
+          Any special circumstances? Let us know and we'll do our best to accommodate!
         </label>
         <textarea
           id="additionalNotes"
