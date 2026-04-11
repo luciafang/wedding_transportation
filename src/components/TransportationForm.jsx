@@ -48,19 +48,8 @@ const schema = z
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['bnaArrivalTime'],
-          message: 'Please specify when the car will arrive at Bali airport'
+          message: 'Please select a pickup time'
         });
-      } else {
-        const h = values.bnaArrivalTime.getHours();
-        const m = values.bnaArrivalTime.getMinutes();
-        const totalMins = h * 60 + m;
-        if (totalMins < 780 || totalMins > 900) { // 1:00 PM (780) – 3:00 PM (900)
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['bnaArrivalTime'],
-            message: 'Shuttle is available between 1:00 PM and 3:00 PM only'
-          });
-        }
       }
     }
 
@@ -97,19 +86,8 @@ const schema = z
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ['hotelDepartureTime'],
-          message: 'Please specify when you plan to leave the hotel'
+          message: 'Please select a departure time'
         });
-      } else {
-        const h = values.hotelDepartureTime.getHours();
-        const m = values.hotelDepartureTime.getMinutes();
-        const totalMins = h * 60 + m;
-        if (totalMins < 720 || totalMins > 840) { // 12:00 PM (720) – 2:00 PM (840)
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['hotelDepartureTime'],
-            message: 'Shuttle is available between 12:00 PM and 2:00 PM only'
-          });
-        }
       }
     }
 
@@ -169,79 +147,79 @@ const serialize = (values) => ({
   departureTime: values.departureTime ? values.departureTime.toISOString() : null
 });
 
-// ── SVG Icon Components ──────────────────────────────────────
+// ── SVG Icon Components — teal/sage themed ──────────────────
 const IconPerson = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }}>
-    <circle cx="8" cy="5" r="3" stroke="var(--green)" strokeWidth="1.4" />
-    <path d="M2.5 14C2.5 11 4.5 9 8 9C11.5 9 13.5 11 13.5 14" stroke="var(--green)" strokeWidth="1.4" strokeLinecap="round" />
+  <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style={{ marginRight: 5, verticalAlign: 'middle', flexShrink: 0 }}>
+    <circle cx="8" cy="5" r="3" stroke="var(--teal)" strokeWidth="1.3" />
+    <path d="M2.5 14C2.5 11 4.5 9 8 9C11.5 9 13.5 11 13.5 14" stroke="var(--teal)" strokeWidth="1.3" strokeLinecap="round" />
   </svg>
 );
 
 const IconEnvelope = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }}>
-    <rect x="1.5" y="3.5" width="13" height="9" rx="2" stroke="var(--teal)" strokeWidth="1.4" />
-    <path d="M1.5 5L8 9.5L14.5 5" stroke="var(--teal)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+  <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style={{ marginRight: 5, verticalAlign: 'middle', flexShrink: 0 }}>
+    <rect x="1.5" y="3.5" width="13" height="9" rx="2" stroke="var(--green)" strokeWidth="1.3" />
+    <path d="M1.5 5L8 9.5L14.5 5" stroke="var(--green)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const IconPeople = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }}>
-    <circle cx="6" cy="5" r="2.5" stroke="var(--green)" strokeWidth="1.3" />
-    <path d="M1.5 13C1.5 10.5 3.2 9 6 9C8.8 9 10.5 10.5 10.5 13" stroke="var(--green)" strokeWidth="1.3" strokeLinecap="round" />
-    <circle cx="11" cy="5.5" r="2" stroke="var(--teal)" strokeWidth="1.2" />
-    <path d="M8.5 13C8.5 11 9.5 9.5 11 9.5C12.5 9.5 14 11 14 13" stroke="var(--teal)" strokeWidth="1.2" strokeLinecap="round" />
+  <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style={{ marginRight: 5, verticalAlign: 'middle', flexShrink: 0 }}>
+    <circle cx="6" cy="5" r="2.5" stroke="var(--teal)" strokeWidth="1.2" />
+    <path d="M1.5 13C1.5 10.5 3.2 9 6 9C8.8 9 10.5 10.5 10.5 13" stroke="var(--teal)" strokeWidth="1.2" strokeLinecap="round" />
+    <circle cx="11" cy="5.5" r="2" stroke="var(--green)" strokeWidth="1.1" />
+    <path d="M8.5 13C8.5 11 9.5 9.5 11 9.5C12.5 9.5 14 11 14 13" stroke="var(--green)" strokeWidth="1.1" strokeLinecap="round" />
   </svg>
 );
 
 const IconShuttle = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }}>
-    <rect x="1" y="4" width="14" height="7" rx="2" stroke="var(--green)" strokeWidth="1.4" />
-    <rect x="2.5" y="5.5" width="3" height="2.5" rx="0.5" fill="var(--teal-light)" />
-    <rect x="6.5" y="5.5" width="3" height="2.5" rx="0.5" fill="var(--teal-light)" />
-    <rect x="10.5" y="5.5" width="3" height="2.5" rx="0.5" fill="var(--teal-light)" />
-    <circle cx="4.5" cy="12" r="1.2" fill="var(--green)" />
-    <circle cx="11.5" cy="12" r="1.2" fill="var(--green)" />
-    <line x1="1" y1="12" x2="15" y2="12" stroke="var(--green)" strokeWidth="0.8" />
+  <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style={{ marginRight: 5, verticalAlign: 'middle', flexShrink: 0 }}>
+    <rect x="1" y="4" width="14" height="7" rx="2" stroke="var(--teal)" strokeWidth="1.3" />
+    <rect x="2.5" y="5.5" width="3" height="2.5" rx="0.5" fill="var(--teal-pale)" />
+    <rect x="6.5" y="5.5" width="3" height="2.5" rx="0.5" fill="var(--teal-pale)" />
+    <rect x="10.5" y="5.5" width="3" height="2.5" rx="0.5" fill="var(--teal-pale)" />
+    <circle cx="4.5" cy="12" r="1.2" fill="var(--teal)" />
+    <circle cx="11.5" cy="12" r="1.2" fill="var(--teal)" />
+    <line x1="1" y1="12" x2="15" y2="12" stroke="var(--teal)" strokeWidth="0.7" />
   </svg>
 );
 
 const IconClock = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }}>
-    <circle cx="8" cy="8" r="6" stroke="var(--champagne)" strokeWidth="1.4" />
-    <line x1="8" y1="4.5" x2="8" y2="8" stroke="var(--champagne)" strokeWidth="1.4" strokeLinecap="round" />
-    <line x1="8" y1="8" x2="11" y2="10" stroke="var(--champagne)" strokeWidth="1.4" strokeLinecap="round" />
-    <circle cx="8" cy="8" r="0.8" fill="var(--champagne)" />
+  <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style={{ marginRight: 5, verticalAlign: 'middle', flexShrink: 0 }}>
+    <circle cx="8" cy="8" r="6" stroke="var(--blue)" strokeWidth="1.3" />
+    <line x1="8" y1="4.5" x2="8" y2="8" stroke="var(--blue)" strokeWidth="1.3" strokeLinecap="round" />
+    <line x1="8" y1="8" x2="11" y2="10" stroke="var(--blue)" strokeWidth="1.3" strokeLinecap="round" />
+    <circle cx="8" cy="8" r="0.7" fill="var(--blue)" />
   </svg>
 );
 
 const IconNotes = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }}>
-    <rect x="2" y="1.5" width="12" height="13" rx="2" stroke="var(--teal)" strokeWidth="1.4" />
-    <line x1="5" y1="5" x2="11" y2="5" stroke="var(--teal)" strokeWidth="1.2" strokeLinecap="round" />
-    <line x1="5" y1="8" x2="11" y2="8" stroke="var(--teal)" strokeWidth="1.2" strokeLinecap="round" />
-    <line x1="5" y1="11" x2="9" y2="11" stroke="var(--teal)" strokeWidth="1.2" strokeLinecap="round" />
+  <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style={{ marginRight: 5, verticalAlign: 'middle', flexShrink: 0 }}>
+    <rect x="2" y="1.5" width="12" height="13" rx="2" stroke="var(--green)" strokeWidth="1.3" />
+    <line x1="5" y1="5" x2="11" y2="5" stroke="var(--green-light)" strokeWidth="1.1" strokeLinecap="round" />
+    <line x1="5" y1="8" x2="11" y2="8" stroke="var(--green-light)" strokeWidth="1.1" strokeLinecap="round" />
+    <line x1="5" y1="11" x2="9" y2="11" stroke="var(--green-light)" strokeWidth="1.1" strokeLinecap="round" />
   </svg>
 );
 
 const IconSuitcase = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: 6, verticalAlign: 'middle', flexShrink: 0 }}>
-    <rect x="2" y="5" width="12" height="8" rx="2" stroke="var(--champagne)" strokeWidth="1.4" />
-    <path d="M5.5 5V3.5C5.5 2.67 6.17 2 7 2H9C9.83 2 10.5 2.67 10.5 3.5V5" stroke="var(--champagne)" strokeWidth="1.4" />
-    <line x1="2" y1="9" x2="14" y2="9" stroke="var(--champagne)" strokeWidth="1" opacity="0.5" />
+  <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style={{ marginRight: 5, verticalAlign: 'middle', flexShrink: 0 }}>
+    <rect x="2" y="5" width="12" height="8" rx="2" stroke="var(--teal)" strokeWidth="1.3" />
+    <path d="M5.5 5V3.5C5.5 2.67 6.17 2 7 2H9C9.83 2 10.5 2.67 10.5 3.5V5" stroke="var(--teal)" strokeWidth="1.3" />
+    <line x1="2" y1="9" x2="14" y2="9" stroke="var(--teal-light)" strokeWidth="0.8" opacity="0.5" />
   </svg>
 );
 
 const IconCheckCircle = () => (
   <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-    <circle cx="20" cy="20" r="18" fill="var(--green)" />
-    <path d="M13 20L18 25L27 15" stroke="white" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="20" cy="20" r="18" fill="var(--teal)" />
+    <path d="M13 20L18 25L27 15" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const DecoLeaf = () => (
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="success-deco-leaf">
-    <path d="M10 2C10 2 4 6 4 12C4 16 7 18 10 18C13 18 16 16 16 12C16 6 10 2 10 2Z" fill="var(--green)" opacity="0.3" />
-    <path d="M10 5V16" stroke="var(--green)" strokeWidth="0.8" opacity="0.4" />
+    <path d="M10 2C10 2 4 6 4 12C4 16 7 18 10 18C13 18 16 16 16 12C16 6 10 2 10 2Z" fill="var(--green)" opacity="0.25" />
+    <path d="M10 5V16" stroke="var(--green)" strokeWidth="0.7" opacity="0.35" />
   </svg>
 );
 
@@ -283,11 +261,11 @@ const conditionalVariants = {
 };
 
 // ── Time range boundaries ────────────────────────────────────
-// Shuttle arrival (June 13): 1:00 PM – 3:00 PM
+// Shuttle arrival pickup (June 13): 2:00 PM – 2:30 PM
 const arrivalMinTime = new Date();
-arrivalMinTime.setHours(13, 0, 0, 0);
+arrivalMinTime.setHours(14, 0, 0, 0);
 const arrivalMaxTime = new Date();
-arrivalMaxTime.setHours(15, 0, 0, 0);
+arrivalMaxTime.setHours(14, 30, 0, 0);
 
 // Self-arrival at Alila (June 13): 3:00 PM – 5:00 PM
 const alilaArrivalMinTime = new Date();
@@ -295,11 +273,11 @@ alilaArrivalMinTime.setHours(15, 0, 0, 0);
 const alilaArrivalMaxTime = new Date();
 alilaArrivalMaxTime.setHours(17, 0, 0, 0);
 
-// Shuttle departure (June 15): 12:00 PM – 2:00 PM
+// Shuttle departure from hotel (June 15): 1:15 PM – 1:30 PM
 const departureMinTime = new Date();
-departureMinTime.setHours(12, 0, 0, 0);
+departureMinTime.setHours(13, 15, 0, 0);
 const departureMaxTime = new Date();
-departureMaxTime.setHours(14, 0, 0, 0);
+departureMaxTime.setHours(13, 30, 0, 0);
 
 // Self-departure from Alila (June 15): before 2:00 PM
 const alilaDepartureMinTime = new Date();
@@ -307,14 +285,14 @@ alilaDepartureMinTime.setHours(0, 0, 0, 0);
 const alilaDepartureMaxTime = new Date();
 alilaDepartureMaxTime.setHours(14, 0, 0, 0);
 
-// ── Celebration particles (green + teal + champagne) ──────────
+// ── Celebration particles (teal + sage + blue) ──────────────
 const celebrationParticles = [
-  { type: 'heart', left: '15%', top: '60%', size: 16, color: 'rgba(92,184,138,0.5)', duration: 2.5, delay: 0.2, travel: -120, drift: -25, rotation: 120 },
-  { type: 'star', left: '30%', top: '50%', size: 13, color: 'rgba(91,190,181,0.4)', duration: 3, delay: 0.5, travel: -140, drift: 15, rotation: 200 },
-  { type: 'sparkle-dot', left: '45%', top: '55%', size: 7, color: 'rgba(92,184,138,0.55)', duration: 2.8, delay: 0.1, travel: -100, drift: -10, rotation: 90 },
-  { type: 'heart', left: '60%', top: '60%', size: 14, color: 'rgba(212,169,106,0.4)', duration: 3.2, delay: 0.7, travel: -130, drift: 30, rotation: 150 },
-  { type: 'sparkle-dot', left: '75%', top: '50%', size: 5, color: 'rgba(91,190,181,0.5)', duration: 2.6, delay: 0.3, travel: -110, drift: -20, rotation: 180 },
-  { type: 'star', left: '85%', top: '55%', size: 11, color: 'rgba(212,169,106,0.45)', duration: 2.9, delay: 0.6, travel: -105, drift: 18, rotation: 240 },
+  { type: 'heart', left: '15%', top: '60%', size: 16, color: 'rgba(90,158,173,0.4)', duration: 2.8, delay: 0.2, travel: -120, drift: -25, rotation: 120 },
+  { type: 'star', left: '30%', top: '50%', size: 13, color: 'rgba(107,168,154,0.35)', duration: 3.2, delay: 0.5, travel: -140, drift: 15, rotation: 200 },
+  { type: 'sparkle-dot', left: '45%', top: '55%', size: 7, color: 'rgba(91,143,185,0.45)', duration: 3, delay: 0.1, travel: -100, drift: -10, rotation: 90 },
+  { type: 'heart', left: '60%', top: '60%', size: 14, color: 'rgba(107,168,154,0.35)', duration: 3.4, delay: 0.7, travel: -130, drift: 30, rotation: 150 },
+  { type: 'sparkle-dot', left: '75%', top: '50%', size: 5, color: 'rgba(90,158,173,0.4)', duration: 2.8, delay: 0.3, travel: -110, drift: -20, rotation: 180 },
+  { type: 'star', left: '85%', top: '55%', size: 11, color: 'rgba(91,143,185,0.35)', duration: 3.1, delay: 0.6, travel: -105, drift: 18, rotation: 240 },
 ];
 
 const TransportationForm = () => {
@@ -592,7 +570,7 @@ const TransportationForm = () => {
         )}
       </motion.div>
 
-      {/* Arrival — conditional fields */}
+      {/* Arrival — "yes": pick time (only allowed slots shown) */}
       <AnimatePresence>
         {arrivalTransportation === 'yes' && (
           <motion.div
@@ -606,7 +584,7 @@ const TransportationForm = () => {
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label className="form-label form-label-required" htmlFor="bnaArrivalTime">
                 <IconClock />
-                When do you expect the car to arrive at Bali airport?
+                Car pickup time at Bali airport
               </label>
               <Controller
                 name="bnaArrivalTime"
@@ -624,7 +602,7 @@ const TransportationForm = () => {
                     timeIntervals={15}
                     timeCaption="Time"
                     dateFormat="h:mm aa"
-                    placeholderText="Between 1:00 PM – 3:00 PM"
+                    placeholderText="Select a time"
                     minTime={arrivalMinTime}
                     maxTime={arrivalMaxTime}
                     className="form-input"
@@ -722,7 +700,7 @@ const TransportationForm = () => {
         )}
       </motion.div>
 
-      {/* Departure — conditional fields */}
+      {/* Departure — "yes": pick time (only allowed slots shown) */}
       <AnimatePresence>
         {departureTransportation === 'yes' && (
           <motion.div
@@ -736,7 +714,7 @@ const TransportationForm = () => {
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label className="form-label form-label-required" htmlFor="hotelDepartureTime">
                 <IconClock />
-                When do you plan to leave from the hotel?
+                Shuttle departure time from hotel
               </label>
               <Controller
                 name="hotelDepartureTime"
@@ -754,7 +732,7 @@ const TransportationForm = () => {
                     timeIntervals={15}
                     timeCaption="Time"
                     dateFormat="h:mm aa"
-                    placeholderText="Between 12:00 PM – 2:00 PM"
+                    placeholderText="Select a time"
                     minTime={departureMinTime}
                     maxTime={departureMaxTime}
                     className="form-input"

@@ -1,65 +1,81 @@
 :root {
-  /* ── Green / Teal / Blue / Champagne palette ── */
-  --green: #5CB88A;
-  --green-dark: #4A9E74;
-  --green-light: #A8E4C0;
-  --green-pale: #E4F7EC;
+  /* ── Ocean Sage Palette ── */
+  --green: #6BA89A;
+  --green-dark: #4E8A7C;
+  --green-light: #A3D1C5;
+  --green-pale: #E6F3EF;
 
-  --teal: #5BBEB5;
-  --teal-light: #A0E0DA;
-  --teal-pale: #E0F6F4;
+  --teal: #5A9EAD;
+  --teal-light: #92C5D0;
+  --teal-pale: #E2F0F4;
 
-  --blue: #6DB3D4;
-  --blue-light: #A8D8ED;
-  --blue-pale: #E4F2FA;
+  --blue: #5B8FB9;
+  --blue-light: #96BFD8;
+  --blue-pale: #E4EFF7;
 
-  --champagne: #D4A96A;
-  --champagne-light: #E8CFA0;
-  --champagne-pale: #FDF5E8;
-  --champagne-glow: #F5E6CC;
+  --champagne: #B8A48A;
+  --champagne-light: #D4C8B4;
+  --champagne-pale: #F2EDE6;
+  --champagne-glow: #E6DDD0;
+  --champagne-dark: #9A866C;
+
+  /* Primary accent — soft teal-blue */
+  --accent-color: #5A9EAD;
+  --accent-light: #92C5D0;
+  --accent-pale: #E2F0F4;
+  --accent-dark: #3E8290;
 
   /* Legacy aliases */
-  --sage: #5CB88A;
-  --sage-dark: #4A9E74;
-  --sage-light: #E4F7EC;
-  --sage-subtle: #E4F7EC;
-  --blush: #D4A96A;
-  --blush-dark: #B8904E;
-  --blush-light: #FDF5E8;
-  --blush-subtle: #FDF5E8;
-  --champagne-dark: #B8904E;
-  --champagne-subtle: #FDF5E8;
+  --sage: #6BA89A;
+  --sage-dark: #4E8A7C;
+  --sage-light: #E6F3EF;
+  --sage-subtle: #E6F3EF;
+  --blush: #B8A48A;
+  --blush-dark: #9A866C;
+  --blush-light: #F2EDE6;
+  --blush-subtle: #F2EDE6;
+  --champagne-subtle: #F2EDE6;
 
-  /* Neutral tones */
-  --accent: #2A3A30;
-  --accent-light: #444444;
-  --muted: #A3B5AA;
-  --text: #2A3A30;
-  --text-soft: #6B7E72;
-  --text-muted: #A3B5AA;
-  --bg: #FFFFFF;
-  --surface: #FDFCFA;
-  --subtle: #F6FAF8;
-  --border: #E6EDE9;
+  /* Gold replaced with muted sage-blue */
+  --gold: #5A9EAD;
+  --gold-light: #92C5D0;
+  --gold-pale: #E2F0F4;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(42,58,48,0.03);
-  --shadow-md: 0 4px 16px rgba(42,58,48,0.04), 0 16px 56px rgba(92,184,138,0.06);
-  --shadow-lg: 0 4px 12px rgba(0,0,0,0.05), 0 16px 48px rgba(0,0,0,0.08);
+  /* Neutral tones — cool, refined */
+  --accent: #2C3640;
+  --accent-lt: #4A5662;
+  --muted: #A4B0B8;
+  --text: #2C3640;
+  --text-soft: #506068;
+  --text-muted: #8E9CA4;
+  --bg: #F8FAFB;
+  --bg-warm: #F5F8F9;
+  --surface: #F8FAFB;
+  --subtle: #F0F4F5;
+  --border: #DAE2E6;
+  --border-light: #E8EEF0;
+
+  /* Shadows — cool-tinted */
+  --shadow-sm: 0 1px 3px rgba(44,54,64,0.04);
+  --shadow-md: 0 4px 20px rgba(44,54,64,0.05), 0 1px 3px rgba(44,54,64,0.03);
+  --shadow-lg: 0 12px 40px rgba(44,54,64,0.07), 0 4px 12px rgba(44,54,64,0.03);
+  --shadow-accent: 0 4px 20px rgba(90,158,173,0.12);
 
   /* Radii */
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
   --radius-xl: 24px;
   --radius-full: 999px;
 
   /* Transitions */
-  --transition: all 250ms ease;
+  --transition: all 300ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-slow: all 500ms cubic-bezier(0.25, 0.1, 0.25, 1);
 
   /* Typography */
-  --font-sans: 'Outfit', 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-serif: 'Outfit', system-ui, sans-serif;
+  --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Jost', 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
 }
 
 /* Base */
@@ -71,14 +87,15 @@ html, body {
 html {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  font-size: 16px;
 }
 
 body {
   font-family: var(--font-sans);
-  line-height: 1.5;
+  line-height: 1.6;
   font-weight: 400;
   color: var(--text);
-  background: #FFFFFF;
+  background: var(--bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -98,18 +115,19 @@ body {
 }
 
 h1, h2, h3, h4 {
-  font-family: var(--font-sans);
-  font-weight: 700;
-  line-height: 1.2;
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
 }
 
 ::selection {
-  background: rgba(92, 184, 138, 0.25);
+  background: rgba(90, 158, 173, 0.2);
 }
 
 :focus-visible {
-  outline: 2px solid var(--green);
-  outline-offset: 2px;
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
 a {
@@ -122,9 +140,15 @@ button, input, select, textarea {
   touch-action: manipulation;
 }
 
-@media (max-width: 768px) {
-  :root {
-    --space-lg: 32px;
-    --space-md: 24px;
-  }
+/* Responsive base font sizing */
+@media (max-width: 480px) {
+  html { font-size: 15px; }
+}
+
+@media (min-width: 1400px) {
+  html { font-size: 17px; }
+}
+
+@media (min-width: 1800px) {
+  html { font-size: 18px; }
 }
