@@ -86,25 +86,14 @@ const serialize = (v) => ({
 
 const makeTime = (h, m) => { const d = new Date(); d.setHours(h, m, 0, 0); return d; };
 
-const makeTimes = (startH, startM, endH, endM, step = 15) => {
-  const times = [];
-  let h = startH, m = startM;
-  while (h < endH || (h === endH && m <= endM)) {
-    times.push(makeTime(h, m));
-    m += step;
-    if (m >= 60) { h += 1; m -= 60; }
-  }
-  return times;
-};
-
-// "Yes" shuttle pickup: 2:00, 2:15, 2:30 PM
-const arrivalTimes = makeTimes(14, 0, 14, 30);
-// "No" arrive at Alila: 3:00 PM – 5:00 PM
-const alilaArrivalTimes = makeTimes(15, 0, 17, 0);
-// "Yes" shuttle from hotel: 1:00, 1:15, 1:30 PM
-const departureTimes = makeTimes(13, 0, 13, 30);
-// "No" leave Alila: 10:00 AM – 2:00 PM
-const alilaDepartureTimes = makeTimes(10, 0, 14, 0);
+// Shuttle pickup: 2:00 – 2:30 PM
+const arrivalRange = { min: makeTime(14, 0), max: makeTime(14, 30) };
+// Arrive at Alila: 3:00 – 5:00 PM
+const alilaArrivalRange = { min: makeTime(15, 0), max: makeTime(17, 0) };
+// Shuttle from hotel: 1:00 – 1:30 PM
+const departureRange = { min: makeTime(13, 0), max: makeTime(13, 30) };
+// Leave Alila: 9:00 AM – 2:00 PM
+const alilaDepartureRange = { min: makeTime(9, 0), max: makeTime(14, 0) };
 
 const slide = {
   initial: { opacity: 0, height: 0 },
@@ -235,7 +224,7 @@ const TransportationForm = () => {
                   onChange={d => { field.onChange(d); clearErrors('bnaArrivalTime'); }}
                   showTimeSelect showTimeSelectOnly timeIntervals={15} timeCaption="Time"
                   dateFormat="h:mm aa" placeholderText="Select a time"
-                  includeTimes={arrivalTimes} className="form-input" />
+                  minTime={arrivalRange.min} maxTime={arrivalRange.max} className="form-input" />
               )} />
               {errors.bnaArrivalTime && <span className="form-error">{errors.bnaArrivalTime.message}</span>}
             </div>
@@ -253,7 +242,7 @@ const TransportationForm = () => {
                   onChange={d => { field.onChange(d); clearErrors('arrivalTime'); }}
                   showTimeSelect showTimeSelectOnly timeIntervals={15} timeCaption="Time"
                   dateFormat="h:mm aa" placeholderText="Select a time"
-                  includeTimes={alilaArrivalTimes}
+                  minTime={alilaArrivalRange.min} maxTime={alilaArrivalRange.max}
                   className="form-input" />
               )} />
               {errors.arrivalTime && <span className="form-error">{errors.arrivalTime.message}</span>}
@@ -289,7 +278,7 @@ const TransportationForm = () => {
                   onChange={d => { field.onChange(d); clearErrors('hotelDepartureTime'); }}
                   showTimeSelect showTimeSelectOnly timeIntervals={15} timeCaption="Time"
                   dateFormat="h:mm aa" placeholderText="Select a time"
-                  includeTimes={departureTimes} className="form-input" />
+                  minTime={departureRange.min} maxTime={departureRange.max} className="form-input" />
               )} />
               {errors.hotelDepartureTime && <span className="form-error">{errors.hotelDepartureTime.message}</span>}
             </div>
@@ -307,7 +296,7 @@ const TransportationForm = () => {
                   onChange={d => { field.onChange(d); clearErrors('departureTime'); }}
                   showTimeSelect showTimeSelectOnly timeIntervals={15} timeCaption="Time"
                   dateFormat="h:mm aa" placeholderText="Select a time"
-                  includeTimes={alilaDepartureTimes}
+                  minTime={alilaDepartureRange.min} maxTime={alilaDepartureRange.max}
                   className="form-input" />
               )} />
               {errors.departureTime && <span className="form-error">{errors.departureTime.message}</span>}
